@@ -6,7 +6,7 @@
 /*   By: cde-moul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/21 11:16:48 by cde-moul          #+#    #+#             */
-/*   Updated: 2019/06/22 13:24:47 by cde-moul         ###   ########.fr       */
+/*   Updated: 2019/07/22 14:18:37 by cde-moul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ int				mn_getarg(t_mini *infos, char *line)
 
 	a = 0;
 	i = 0;
-	if (!line[0])
+	if (!line || !line[0])
 		return (1);
 	while (line[i] && line[i] < 33)
 		i++;
@@ -102,12 +102,14 @@ int				mn_read(t_mini *infos)
 {
 	char	*line;
 	int		res;
+	char	*save;
 
+	save = NULL;
 	line = NULL;
-	ft_putstr("$> ");
-	while (get_next_line(STDIN_FILENO, &line))
+	mn_prompt(infos);
+	while (get_next_line(STDIN_FILENO, &line) == 1)
 	{
-		res = mn_treat(infos, line);
+		res = mn_treat(infos, &line, &save);
 		if (infos->flagson == 1)
 			mn_freeflags(infos);
 		free(line);
@@ -117,9 +119,9 @@ int				mn_read(t_mini *infos)
 			free(infos->cmd);
 			infos->cmd = NULL;
 		}
-		if (res == -1)
+		if (res == -1 || mn_whilesave(infos, &line, &save) == -1)
 			return (0);
-		ft_putstr("$> ");
+		mn_prompt(infos);
 	}
 	return (0);
 }

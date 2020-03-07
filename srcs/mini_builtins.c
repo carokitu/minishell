@@ -6,7 +6,7 @@
 /*   By: cde-moul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/22 12:26:34 by cde-moul          #+#    #+#             */
-/*   Updated: 2019/06/23 16:23:08 by cde-moul         ###   ########.fr       */
+/*   Updated: 2019/07/22 14:00:31 by cde-moul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,7 @@ int		mn_echo(t_mini *infos)
 	{
 		if (i != 1 && !(i == 2 && ret == 0))
 			ft_putchar(' ');
-		if (infos->flags[i][0] == '$')
-			mn_putdolls(infos->flags[i], infos);
-		else
-			ft_putstr(infos->flags[i]);
+		ft_putstr(infos->flags[i]);
 	}
 	if (ret == 1)
 		ft_putchar('\n');
@@ -59,41 +56,30 @@ int		mn_setenv(t_mini *infos)
 	int res;
 
 	res = 0;
-	printf("SETENV : infos->cmd : %s\n", infos->cmd);
 	res = mn_setenvarg(infos);
 	if (res == 1)
 		return (1);
-	if (res == 2)
-		return (0);
-// TRAITER LES BON CAS AVEC FORK ET EXECVE <3
 	return (0);
 }
 
 int		mn_unsetenv(t_mini *infos)
 {
-	printf("infos->cmd : %s\n", infos->cmd);	
-	return (0);
-}
+	int i;
 
-int		mn_env(t_mini *infos)
-{
-	int res;
-	int	i;
-
-	i = 0;
-	res = mn_checkenv(infos);
-	if (res == 1)
-		return (1);
-	if (res == 2)
-		return (0);
-	while (infos->env[++i])
+	i = -1;
+	if (infos->flags[2])
 	{
-		if (i != infos->skipenv)
+		ft_putstr_fd("unsetenv: usage: [NAME]\n", STDOUT_FILENO);
+		return (1);
+	}
+	while (infos->flags[1][++i])
+	{
+		if (infos->flags[1][i] == '=')
 		{
-			ft_putstr(infos->env[i]);
-			ft_putchar('\n');
+			ft_putstr_fd("unsetenv: name must not contain '=' character\n",
+					STDOUT_FILENO);
+			return (1);
 		}
 	}
-	infos->skipenv = -1;
-	return (0);
+	return (mn_unsetenv2(infos));
 }

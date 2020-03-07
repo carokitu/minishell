@@ -6,7 +6,7 @@
 /*   By: cde-moul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/21 13:18:43 by cde-moul          #+#    #+#             */
-/*   Updated: 2019/06/23 15:54:47 by cde-moul         ###   ########.fr       */
+/*   Updated: 2019/07/22 14:01:13 by cde-moul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,8 @@ static int	mn_changecmd(t_mini *infos, char *path, DIR *dir)
 
 static void	mn_printerror(char *error)
 {
-	ft_putstr_fd("minishell: command not found: ", STDERR_FILENO);
 	ft_putstr_fd(error, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
+	ft_putstr_fd(": Command not found.\n", STDERR_FILENO);
 }
 
 static int	mn_checkbin(t_mini *infos)
@@ -64,7 +63,9 @@ static int	mn_checkbin(t_mini *infos)
 		}
 		i++;
 	}
-	mn_printerror(infos->cmd);
+	if (mn_isexc(infos) == 0)
+		return (0);
+	mn_printerror(infos->flags[0]);
 	return (1);
 }
 
@@ -91,7 +92,15 @@ int			mn_checkarg(t_mini *infos)
 		if (ft_strcmp(infos->cmd, fonction[i]) == 0)
 			return (0);
 	}
-	if (ft_strcmp(infos->cmd, "exit") == 0)
-		return (-1);
+	if (ft_strcmp(infos->cmd, "exit") == 0 && !(infos->flags[1]))
+	{
+		infos->exit = 1;
+		return (0);
+	}
+	else if (ft_strcmp(infos->cmd, "exit") == 0)
+	{
+		ft_putstr_fd("exit: Expression Syntax.\n", STDOUT_FILENO);
+		return (0);
+	}
 	return (mn_checkcmd(infos));
 }

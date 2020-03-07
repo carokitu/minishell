@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: cde-moul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/21 12:48:05 by cde-moul          #+#    #+#             */
-/*   Updated: 2019/06/22 13:39:21 by cde-moul         ###   ########.fr       */
+/*   Created: 2019/07/16 16:46:58 by cde-moul          #+#    #+#             */
+/*   Updated: 2019/07/22 14:40:03 by cde-moul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,7 @@
 
 void		mn_binary(t_mini *infos)
 {
-	int	i;
-
-	i = -1;
-	ft_putstr("binaire : ");
-	ft_putstr(infos->cmd);
-	ft_putstr("\n");
-	while (infos->flags[++i])
-	{
-		ft_putstr("infos->flags ");
-		ft_putnbr(i);
-		ft_putstr(" : ");
-		ft_putnbr(i);
-		ft_putstr(infos->flags[i]);
-		ft_putstr("\n");
-	}
+	mn_treatbinary(infos);
 }
 
 static int	mn_infct(t_mini *infos, int i)
@@ -62,17 +48,19 @@ static int	mn_builtins(t_mini *infos)
 	return (mn_infct(infos, i));
 }
 
-int			mn_treat(t_mini *infos, char *line)
+int			mn_treat(t_mini *infos, char **line, char **save)
 {
 	int	res;
 
 	res = 0;
-	if (mn_getarg(infos, line) == 1)
+	mn_checksep(line, save);
+	if (mn_getarg(infos, *line) == 1 || mn_checkdolls(infos) == 1)
 		return (1);
+	mn_checkflags(infos);
 	res = mn_checkarg(infos);
 	if (res != 0)
 		return (res);
-	if (infos->cmd[0] == '/')
+	if (infos->cmd[0] == '/' || infos->cmd[0] == '.')
 		mn_binary(infos);
 	else
 		return (mn_builtins(infos));
